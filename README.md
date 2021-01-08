@@ -31,7 +31,7 @@ Some developers use a server-side integration with Mobile Measurement Providers 
 
 
 
-## Request Token
+### Request Token
 
 ```objective-c
 + (NSString *)attributionTokenWithError:(NSError * _Nullable *)error;
@@ -41,7 +41,7 @@ The token that the framework returns is a string and has a 24-hour TTL.
 
 
 
-### AAAttributionErrorCode
+##### AAAttributionErrorCode
 
 ```objective-c
 typedef enum AAAttributionErrorCode : NSInteger {
@@ -67,7 +67,7 @@ A token was not provided because the OS platform is unsupported.
 
 
 
-## Request attribution
+### Request attribution
 
 You can provide the token to a MMP or app developers can use the token to make a POST API call within the 24-hour TTL window to fetch attribution records. Use a single token in the request body:
 
@@ -78,30 +78,15 @@ this_is_a_token_this_is_a_token_this_is_a_token_this_is_a_token_this_is_a_token_
 ```
 
 ### Response Codes
+| Response                           | Description |
+| --------------------------------------------------------- | --------------------------------------------------------- |
+| 200 | Success. The API found a matching attribution record. The payload returns `attribution=true`. <br/>If the API doesn’t find a matching attribution record, `attribution=false`. In this case, the 200 response is an acknowledgement of the receipt of the data request.  |
+| 400 | The token is invalid.  |
+| 404 | Not found. The API is unable to retrieve the requested attribution record.<br/>Tokens have a TTL of 24 hours. If the POST API call exceeds 24 hours then a 404 response will result.<br/>If your token is valid, a best practice is to initiate retries at intervals of 5 seconds with a max retry of 3 attempts.  |
+| 500 | The server is temporarily down or not reachable. The request may be valid, but you need to retry the request at a later point.|
 
-* 200
 
-  Success. The API found a matching attribution record. The payload returns `attribution=true`.
 
-  If the API doesn’t find a matching attribution record, `attribution=false`. In this case, the 200 response is an acknowledgement of the receipt of the data request.
-
-* 400
-
-  The token is invalid.
-
-* 404
-
-  Not found. The API is unable to retrieve the requested attribution record.
-
-  Tokens have a TTL of 24 hours. If the POST API call exceeds 24 hours then a 404 response will result.
-
-  If your token is valid, a best practice is to initiate retries at intervals of 5 seconds with a max retry of 3 attempts.
-
-* 500
-
-  The server is temporarily down or not reachable. The request may be valid, but you need to retry the request at a later point.
-
-  
 
 ### Attribution Payload
 
