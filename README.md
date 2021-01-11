@@ -1,6 +1,6 @@
 # 苹果 Apple Search Ads 全新归因框架 AdServices Framework
 
-*更新日期：2021-01-11*
+*更新日期：2021-01-11 by [量江湖](https://www.liangjianghu.com/)*
 
 
 
