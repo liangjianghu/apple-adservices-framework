@@ -1,44 +1,45 @@
-# 苹果 Apple Search Ads 全新归因框架 AdServices Framework
+# 苹果 Apple Search Ads 全新归因方案
 
 *更新日期：2021-01-11 by [量江湖](https://www.liangjianghu.com/)*
 
 
+## 概要
 
-Attribute app-download campaigns that originate from the App Store, Apple News, or Stocks on iOS devices.
-
-
-
-归因来自 Apple Search Ads 广告系列的安装（包括 App Store、Apple News 以及 Stocks）。
-
----
+苹果于 2021 年 1 月发布了一个全新的 Apple Search Ads 归因方案。此方案不依赖 IDFA，不受用户隐私政策的影响，在 iOS 14.3 及更高版本的设备上 100% 可归因。
 
 
 
-## 注意事项
+以下是该方案的要点和广告主应对措施：
 
-- 此框架是专门用于归因 Apple Search Ads (ASA) 的安装，未来将替代 [iAd](https://developer.apple.com/documentation/iad)，而不是替代 [SKAdNetwork](https://developer.apple.com/documentation/storekit/skadnetwork)
-- 接入此框架，无论用户是否授权许可“应用追踪透明度框架（ATT）”，来自 Apple Search Ads 的安装均可被正确归因。
-- 涉及到 app 内代码实施，完成此框架接入后 app 需发布新版本
-- 获取令牌必须在 app 内实施，获取归因数据包可以在 app 内或者 server 端实施
-- 采用三方 SDK 的开发者，与您的服务商沟通，并关注其 SDK 版本更新动态
-- 自行实施归因 API 的开发者，可以当前开始实施该 API
-  - 注意版本兼容性，此框架仅支持 iOS 14.3 以上版本。旧版本还需使用 [iAd归因框架](https://developer.apple.com/documentation/iad)
-- 令牌（Token）的有效时间为 24 小时，拿到后需及时请求归因数据
-- 对于经验较少的开发人员，需注意网络请求的成功率和容错性
+- 此归因方案仅适用 Apple Search Ads 广告；仅支持 iOS 14.3 及更高版本；14.3 之前的版本，需使用 [iAd Framework](https://developer.apple.com/documentation/iad) 归因方案
+- 此方案将极大提高 ASA 广告安装的激活率，安装到激活的差距逐渐降至极低(注1)
+- 此方案涉及前后端的系统开发，需自己归因的开发者应尽早制定计划、安排实施
+- 使用 MMP 服务的开发者，与您的服务提供商沟通(注2)，了解其 SDK 对此方案的支持进度
+- 广告主可根据设备版本覆盖进度(注3)，可逐步放开广告的受众限制（即不限制 LAT on 用户）
 
 
 
-## Overview 概要
+注1 排除多渠道投放、特殊异常等原因
+
+注2 截至目前，AppsFlyer SDK V6.1.3 已提供支持
+
+注3 预计 2021 年 3 月，iOS 14.3 及更高版本的覆盖率将超过 50%
+
+
+
+## 方案实施说明
 
 The Apple Ads Attribution API is a solution that combines the AdServices framework on client devices and a RESTful API for server-side communication with Apple’s attribution server. The API retrieves attribution data from app downloads and redownloads from Apple Search Ads campaigns. Measure attribution data using specific Apple Search Ads campaign metadata against the performance of Apple Search Ads campaigns.
-
-苹果广告归因 API 是一种解决方案，结合了客户端设备上的 AdServices 框架和用于与 Apple 的归因服务器进行服务器端通信的 RESTful API。该 API 从来自 Apple Search Ads 活动带来的应用下载及重新下载中检索归因数据。归因数据使用给定的 Apple Search Ads 广告系列元数据来衡量效果。
 
 
 
 Some developers use a server-side integration with Mobile Measurement Providers (MMPs) for enhanced reporting. Developers also have the option to hand off attribution data to a MMP or manage their attribution data themselves. The following diagram illustrates using the AdServices framework in combination with a RESTful endpoint to retrieve attribution data.
 
-一些开发者使用服务器端与移动归因服务商（MMP）的集成来增强报告功能。开发者可以选择将归因数据交给 MMP ，也可以自己管理。下图说明了结合使用 AdServices 框架和 RESTful API 来检索归因数据。
+
+
+这个归因方案，包含两部分：客户端的 AdServices 框架，和从苹果Search Ads归因服务器获取归因数据的 RESTful API。
+
+下图说明了结合使用 AdServices 框架和 RESTful API 来完成归因。
 
 ![A diagram showing the sequence of interaction between the AdServices framework and RESTful API.](https://docs-assets.developer.apple.com/published/0e812f690f/rendered2x-1604339646.png)
 
@@ -52,9 +53,9 @@ Some developers use a server-side integration with Mobile Measurement Providers 
 
 
 * 第一步，AdServices 框架发起调用请求生成token；
-* 第二步，AdServices 框架生成 token。更多详细信息，参考[attributionTokenWithError:](https://developer.apple.com/documentation/adservices/aaattribution/3697093-attributiontokenwitherror?language=objc) ；
-* 第三步，MMP 或开发人员使用 token 发起 RESTful API 请求，苹果的归因服务器响应请求，并从返回的数据中检索归因数据。更多详细信息，参考 [Attribution Payload](https://developer.apple.com/documentation/adservices/aaattribution/3697093-attributiontokenwitherror?language=objc#3697463) ；
-* 第四步，返回的归因数据为字段格式的键值对，这些键值对数据与 Apple Search Ads 广告系列管理API中的广告系列相对应。更多详细信息，参考  [Attribution Payload Descriptions](https://developer.apple.com/documentation/adservices/aaattribution/3697093-attributiontokenwitherror?language=objc#3697458) 。
+* 第二步，AdServices 框架生成 token。
+* 第三步，MMP 或开发人员使用 token 发起 RESTful API 请求，苹果的归因服务器返回归因数据。
+* 第四步，返回的归因数据为字段格式的键值对，这些键值对数据与 Apple Search Ads 广告系列管理API中的广告系列相对应。
 
 
 
@@ -150,7 +151,7 @@ yourtokenyourtokenyourtokenyourtokenyourtokenyourtokenyourtokenyourtokenyourtoke
 ##### Objective-C 请求示例
 
 ```objective-c
-- (void)attributionWithToken:(NSString *)token {
+- (void) attributionWithToken:(NSString *)token {
     NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
     NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:nil];
     NSURL *url = [NSURL URLWithString:@"https://api-adservices.apple.com/api/v1/"];
@@ -175,7 +176,6 @@ yourtokenyourtokenyourtokenyourtokenyourtokenyourtokenyourtokenyourtokenyourtoke
 curl -vvv https://api-adservices.apple.com/api/v1/ \
 -H 'Content-Type:application/json'\
 -d 'yourtokenyourtokenyourtokenyourtoken'
-
 ```
 
 ##### 返回归因数据包示例：
@@ -200,7 +200,7 @@ curl -vvv https://api-adservices.apple.com/api/v1/ \
 
 The API returns two types of attribution records: a standard response and a detailed response. The iOS 14 device level setting Allow Apps to Request to Track (AAtRtT) and details that are available from the attribution payload determine the type of response that the attribution server returns. The AAtRtT setting allows users to opt in or out of allowing apps to request user consent to access app-related data that can be used for both attribution and tracking the user or the device. The following table shows the combination of tracking interactions and expected attribution payload response.
 
-API 返回两种类型的归因记录：标准响应和详细响应。 iOS 14 设备级别的设置允许应用程序请求跟踪（AAtRtT）以及归因负载中可用的详细信息，决定了归因服务器返回的响应类型。 AAtRtT 设置允许用户选择启用或退出允许应用程序请求用户同意访问与应用程序相关的数据，这些数据可用于归因和跟踪用户或设备。下表显示了跟踪交互和预期的归因负载响应的组合。
+API 返回两种类型的归因数据：标准数据包和详细数据包。 iOS 14 设备级别的设置以及单个 app 的跟踪同意状态，决定了归因数据的类型。下表显示了 6 种组合。
 
 | Allow Apps To Request to Track Setting (iOS 14 and above)<br/>允许应用程序请求跟踪设置 | Per App Tracking Consent Status<br/>单个应用程序跟踪同意状态 | AdServices Attribution Payload Response<br/>AdServices 归因数据包 |
 | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -220,6 +220,7 @@ The attribution record is a data dictionary with key value pairs that correspond
 ##### Detailed Payload（详细数据包）
 
 ```json
+// Detailed Payload（详细数据包）
 {
   "attribution": true,
   "orgId": 55555,
@@ -257,7 +258,7 @@ The attribution record is a data dictionary with key value pairs that correspond
 | attribution|Boolean|Has a value of <code>true</code> if the user clicked an Apple Search Ads, News, or Stocks impression up to 30 days before an app download. If the API cannot find a matching attribution record, the attribution value will be <code>false</code>.<br/>如果用户在应用下载前 30 天点击了 App Store、Apple News 以及 Stocks，则其值为 `true`。如果 API 找不到匹配的归因记录，则为`false`。|
 |orgId|Integer|The ID of the organization that owns the campaign of which the corresponding ad was part.<br/>广告系列所属的账户 ID。 |
 |campaignId|Integer|The ID of the campaign of which the corresponding ad was part.<br/>广告系列 ID。 |
-|conversionType|String|The type of conversion will either be <code>newdownloads</code> or <code>redownloads</code>. Redownloads are downloads of an app by users who have previously installed the app.<br/>表明是否首次下载。"Redownload" 说明用户在本设备下载/卸载过，或者用同一账户在其他设备下载过。 |
+|conversionType|String|The type of conversion will either be <code>Download</code> or <code>Redownload</code>. Redownloads are downloads of an app by users who have previously installed the app.<br/>表明是否首次下载。"Redownload" 说明用户在本设备下载/卸载过，或者用同一账户在其他设备下载过。 |
 |clickDate|Date/time string|The date and time when the user clicked an ad in a corresponding campaign. <br/>Note, this field only appears in the detailed response payload.<br/>用户点击相应广告的日期和时间。此字段仅出现在详细归因数据包中。|
 |adGroupId|Integer|The ID of the ad group of which the corresponding ad was part. <br/>广告组 ID。|
 |countryOrRegion|String|The country or region associated with the campaign that drove the install. <br/>国家或地区。|
@@ -268,12 +269,12 @@ The attribution record is a data dictionary with key value pairs that correspond
 
 ## 参考
 
-- [AdServices Framework - Apple Developer Documentation](https://developer.apple.com/documentation/adservices?language=objc)
-- [AppsFlyer SDK 6.1.3 +](https://support.appsflyer.com/hc/en-us/articles/360016711377/ ) 已支持
+- [AdServices Framework - Apple Developer Documentation](https://developer.apple.com/documentation/adservices)
+- [iAd Framework - Apple Developer Documentation](https://developer.apple.com/documentation/iad)
+- [AppsFlyer SDK V6.1.3 +](https://support.appsflyer.com/hc/en-us/articles/360016711377/ ) 已支持
 - Adjust
 - Branch
 - Kochava
 - Singular
 - Tenjin
-
 
