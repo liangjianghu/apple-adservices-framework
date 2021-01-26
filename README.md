@@ -1,33 +1,35 @@
 # 苹果 Apple Search Ads 全新归因方案
 
-*by [量江湖](https://www.liangjianghu.com/)*
+* by [量江湖](https://www.liangjianghu.com/?utm_source=github)*
 
 
-## 概要
 
-苹果于 2021 年 1 月发布了一个全新的 Apple Search Ads 归因方案。此方案不依赖 IDFA，不受用户隐私政策的影响，在 iOS 14.3 及更高版本的设备上 100% 可归因。
+## 一、概要
+
+苹果于 2021 年 1 月发布了一个全新的 Apple Search Ads 归因方案。此方案不依赖 IDFA，不受用户隐私政策的约束，在 iOS 14.3 及更高版本的设备上 100% 可归因。
 
 
 
 以下是该方案的要点和广告主应对措施：
 
-- 此归因方案仅适用 Apple Search Ads 广告；仅支持 iOS 14.3 及更高版本；14.3 之前的版本，需使用 [iAd Framework](https://developer.apple.com/documentation/iad) 归因方案
-- 此方案将极大提高 ASA 广告安装的激活率，安装到激活的差距逐渐降至极低(注1)
+- 此归因方案仅适用 Apple Search Ads 广告；仅支持 iOS 14.3 及更高版本；14.3 之前的版本，需使用 iAd Framework
+- 此方案将极大提高 ASA 广告安装的激活率**(1)**，安装到激活的差距逐渐**(2)**降至极低
 - 此方案涉及前后端的系统开发，需自己归因的开发者应尽早制定计划、安排实施
-- 使用 MMP 服务的开发者，与您的服务提供商沟通(注2)，了解其 SDK 对此方案的支持进度
-- 广告主可根据设备版本覆盖进度(注3)，可逐步放开广告的受众限制（即不限制 LAT on 用户）
+- 使用 MMP 服务的开发者，与您的服务提供商沟通**(3)**，了解其SDK对此方案的支持进度
+- 无论开发者自己实施还是采用 MMP，均需要发布新的app版本
+- 针对 iOS 14 及更高版本的设备，LAT 的概念已失效，受众的年龄和性别定向不再排除限制跟踪的用户
 
 
 
 注1 排除多渠道投放、特殊异常等原因
 
-注2 截至目前，AppsFlyer SDK V6.1.3 已提供支持
+注2 预计2021年3月，iOS 14.3及更高版本的覆盖率将超过50%
 
-注3 预计 2021 年 3 月，iOS 14.3 及更高版本的覆盖率将超过 50%
+注3 截至目前，AppsFlyer SDK V6.1.3 、Adjust SDK V4.25.0 及更高版本已提供支持。
 
 
 
-## 方案实施说明
+## 二、实施说明
 
 The Apple Ads Attribution API is a solution that combines the AdServices framework on client devices and a RESTful API for server-side communication with Apple’s attribution server. The API retrieves attribution data from app downloads and redownloads from Apple Search Ads campaigns. Measure attribution data using specific Apple Search Ads campaign metadata against the performance of Apple Search Ads campaigns.
 
@@ -46,20 +48,20 @@ Some developers use a server-side integration with Mobile Measurement Providers 
 
 
 - In step 1, the AdServices framework makes a call to request a token.
-- In step 2, the AdServices framework generates a token. For more detail, see [attributionTokenWithError:](https://developer.apple.com/documentation/adservices/aaattribution/3697093-attributiontokenwitherror?language=objc).
-- In step 3, an MMP or developer uses the token in a RESTful API request to retrieve an attribution record from Apple’s attribution server. For more detail, see [Attribution Payload](https://developer.apple.com/documentation/adservices/aaattribution/3697093-attributiontokenwitherror?language=objc#3697463).
-- In step 4, the attribution record that is returned has key value pairs that correspond to your campaigns in the Apple Search Ads Campaign Management API. For more detail, see [Attribution Payload Descriptions](https://developer.apple.com/documentation/adservices/aaattribution/3697093-attributiontokenwitherror?language=objc#3697458).
+- In step 2, the AdServices framework generates a token. For more detail, see attributionTokenWithError:.
+- In step 3, an MMP or developer uses the token in a RESTful API request to retrieve an attribution record from Apple’s attribution server. For more detail, see Attribution Payload.
+- In step 4, the attribution record that is returned has key value pairs that correspond to your campaigns in the Apple Search Ads Campaign Management API. For more detail, see Attribution Payload Descriptions.
 
 
 
-* 第一步，AdServices 框架发起调用请求生成token；
-* 第二步，AdServices 框架生成 token。
-* 第三步，MMP 或开发人员使用 token 发起 RESTful API 请求，苹果的归因服务器返回归因数据。
-* 第四步，返回的归因数据为字段格式的键值对，这些键值对数据与 Apple Search Ads 广告系列管理API中的广告系列相对应。
+* 第 1 步，AdServices 框架发起调用请求生成token；
+* 第 2 步，AdServices 框架生成 token。
+* 第 3 步，MMP 或开发人员使用 token 发起 RESTful API 请求，苹果的归因服务器返回归因数据。
+* 第 4 步，返回的归因数据为字段格式的键值对，这些键值对数据与 Apple Search Ads 广告系列管理API中的广告系列相对应。
 
 
 
-### Request Token 请求token
+### 1、Request Token 获取 token
 
 ```objective-c
 + (NSString *)attributionTokenWithError:(NSError * _Nullable *)error;
@@ -83,19 +85,19 @@ typedef enum AAAttributionErrorCode : NSInteger {
 
 
 
-[`AAAttributionErrorCodeInternalError`](https://developer.apple.com/documentation/adservices/aaattributionerrorcode/aaattributionerrorcodeinternalerror?language=objc)
+`AAAttributionErrorCodeInternalError`
 
 A token was not provided because an internal error occurred.
 
 没有返回 token，发生了内部错误。
 
-[`AAAttributionErrorCodeNetworkError`](https://developer.apple.com/documentation/adservices/aaattributionerrorcode/aaattributionerrorcodenetworkerror?language=objc)
+`AAAttributionErrorCodeNetworkError`
 
 A token was not provided because a network is not available.
 
 没有返回 token，网络不可用。
 
-[`AAAttributionErrorCodePlatformNotSupported`](https://developer.apple.com/documentation/adservices/aaattributionerrorcode/aaattributionerrorcodeplatformnotsupported?language=objc)
+`AAAttributionErrorCodePlatformNotSupported`
 
 A token was not provided because the OS platform is unsupported.
 
@@ -103,19 +105,19 @@ A token was not provided because the OS platform is unsupported.
 
 
 
-### Request attribution 发起归因请求
+### 2、Request attribution 获取归因数据
 
 You can provide the token to a MMP or app developers can use the token to make a POST API call within the 24-hour TTL window to fetch attribution records. Use a single token in the request body:
 
 您可以将 token 提供给 MMP，或者使用该 token 在 24 小时内进行 POST API 调用，以获取归因数据。在请求正文中带上 token：
 
-```bash
+```yaml
 POST https://api-adservices.apple.com/api/v1/
 
 yourtokenyourtokenyourtokenyourtokenyourtokenyourtokenyourtokenyourtokenyourtokenyourtokenyourtokenyourtoken
 ```
 
-### Response Codes 返回状态码
+##### Response Codes 返回状态码
 
 | Response状态码                        | Description描述 |
 | --------------------------------------------------------- | --------------------------------------------------------- |
@@ -124,9 +126,13 @@ yourtokenyourtokenyourtokenyourtokenyourtokenyourtokenyourtokenyourtokenyourtoke
 | 404 | Not found. The API is unable to retrieve the requested attribution record.<br/>Tokens have a TTL of 24 hours. If the POST API call exceeds 24 hours then a 404 response will result.<br/>If your token is valid, a best practice is to initiate retries at intervals of 5 seconds with a max retry of 3 attempts.<br/>没有找到。API 无法获取到请求的归因记录。<br/>Tokens 只有 24 小时的有效期。如果请求超过了 24 小时，苹果会返回 404 状态码。<br/>如果 token 是有效的，一个最佳实践：最多重试 3 次，每次间隔 5 秒钟。 |
 | 500 | The server is temporarily down or not reachable. The request may be valid, but you need to retry the request at a later point.<br/>服务器暂时关闭或无法访问。请求可能是有效的，但是你需要选择合适的时间点进行重试。 |
 
-### 示例
 
-#### 获取token：
+
+### 3、代码示例
+
+
+
+#### 1）获取token（Objective-C）
 
 ```objective-c
 #import <AdServices/AdServices.h>
@@ -146,9 +152,7 @@ yourtokenyourtokenyourtokenyourtokenyourtokenyourtokenyourtokenyourtokenyourtoke
 
 
 
-#### 获取归因数据
-
-##### Objective-C 请求示例
+#### 2）获取归因数据（Objective-C）
 
 ```objective-c
 - (void) attributionWithToken:(NSString *)token {
@@ -170,7 +174,9 @@ yourtokenyourtokenyourtokenyourtokenyourtokenyourtokenyourtokenyourtokenyourtoke
 }
 ```
 
-##### cURL 请求示例：
+
+
+#### 3）获取归因数据（cURL）
 
 ```bash
 curl -vvv https://api-adservices.apple.com/api/v1/ \
@@ -178,7 +184,9 @@ curl -vvv https://api-adservices.apple.com/api/v1/ \
 -d 'yourtokenyourtokenyourtokenyourtoken'
 ```
 
-##### 返回归因数据包示例：
+
+
+#### 4）返回归因数据包示例
 
 ```json
 {
@@ -196,7 +204,7 @@ curl -vvv https://api-adservices.apple.com/api/v1/ \
 
 
 
-### Attribution Payload 归因信息
+### 4、Attribution Payload 归因信息
 
 The API returns two types of attribution records: a standard response and a detailed response. The iOS 14 device level setting Allow Apps to Request to Track (AAtRtT) and details that are available from the attribution payload determine the type of response that the attribution server returns. The AAtRtT setting allows users to opt in or out of allowing apps to request user consent to access app-related data that can be used for both attribution and tracking the user or the device. The following table shows the combination of tracking interactions and expected attribution payload response.
 
@@ -251,7 +259,7 @@ The attribution record is a data dictionary with key value pairs that correspond
 
 
 
-#### 归因数据包字段说明
+##### 归因数据包字段说明
 
 | Field<br/>**字段** | Data Type<br/>**类型** | Description<br/>**说明** |
 | --------------------------------------------------------- | --------------------------------------------------------- | --------------------------------------- |
@@ -267,14 +275,55 @@ The attribution record is a data dictionary with key value pairs that correspond
 
 
 
-## 参考
+## 三、归因数据的存储和使用
+
+
+
+>  此部分内容仅考虑ASA单一渠道的广告归因，供开发者参考 
+
+
+
+### 1、归因数据示意和说明
+
+结构和字段说明如下图所示，详细情况需参考官方API文档。
+
+![image-20210126183229234](/Users/wd/Library/Application Support/typora-user-images/image-20210126183229234.png)
+
+*上图中的* convertionType*，官方文档有两处不一致。当前API实际测试，取值为* Download *和* Redownload*。*
+
+已实施过[iAd归因方案](https://developer.apple.com/documentation/iad)的开发者，需注意新旧方案的兼容性，下图为两个方案的数据字段的对比：
+
+![image-20210126183613953](/Users/wd/Library/Application Support/typora-user-images/image-20210126183613953.png)
+
+
+
+### 2、存储示例
+
+假设我们使用一个关系型数据库表来存储的激活设备明细，如下示意
+
+attribution 1表示true，conversion_type 的值为 d 表示Download, r 表示Redownload
+
+![image-20210126183304998](/Users/wd/Library/Application Support/typora-user-images/image-20210126183304998.png)
+
+
+
+### 3、使用示例
+
+#### 按关键词粒度统计每日激活设备数
+
+![image-20210126183336913](/Users/wd/Library/Application Support/typora-user-images/image-20210126183336913.png)
+
+#### 输出结果
+
+![image-20210126183322672](/Users/wd/Library/Application Support/typora-user-images/image-20210126183322672.png)
+
+
+
+## 四、参考资料
 
 - [AdServices Framework - Apple Developer Documentation](https://developer.apple.com/documentation/adservices)
 - [iAd Framework - Apple Developer Documentation](https://developer.apple.com/documentation/iad)
 - [AppsFlyer SDK V6.1.3 +](https://support.appsflyer.com/hc/en-us/articles/360016711377/ ) 已支持
-- Adjust
-- Branch
-- Kochava
-- Singular
-- Tenjin
+- [Adjust SDK V4.25.0+](https://github.com/adjust/ios_sdk/releases/) 已支持
+
 
