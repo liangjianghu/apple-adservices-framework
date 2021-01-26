@@ -287,13 +287,13 @@ The attribution record is a data dictionary with key value pairs that correspond
 
 结构和字段说明如下图所示，详细情况需参考官方API文档。
 
-![image-20210126183229234](/Users/wd/Library/Application Support/typora-user-images/image-20210126183229234.png)
+![image-20210126183229234](./assets/image-20210126183229234.png)
 
 *上图中的* convertionType*，官方文档有两处不一致。当前API实际测试，取值为* Download *和* Redownload*。*
 
 已实施过[iAd归因方案](https://developer.apple.com/documentation/iad)的开发者，需注意新旧方案的兼容性，下图为两个方案的数据字段的对比：
 
-![image-20210126183613953](/Users/wd/Library/Application Support/typora-user-images/image-20210126183613953.png)
+![image-20210126183613953](./assets/image-20210126183613953.png)
 
 
 
@@ -303,7 +303,7 @@ The attribution record is a data dictionary with key value pairs that correspond
 
 attribution 1表示true，conversion_type 的值为 d 表示Download, r 表示Redownload
 
-![image-20210126183304998](/Users/wd/Library/Application Support/typora-user-images/image-20210126183304998.png)
+![image-20210126183304998](./assets/image-20210126183304998.png)
 
 
 
@@ -311,11 +311,11 @@ attribution 1表示true，conversion_type 的值为 d 表示Download, r 表示Re
 
 #### 按关键词粒度统计每日激活设备数
 
-![image-20210126183336913](/Users/wd/Library/Application Support/typora-user-images/image-20210126183336913.png)
+![image-20210126183336913](./assets/image-20210126183336913.png)
 
 #### 输出结果
 
-![image-20210126183322672](/Users/wd/Library/Application Support/typora-user-images/image-20210126183322672.png)
+![image-20210126183322672](./assets/image-20210126183322672.png)
 
 
 
